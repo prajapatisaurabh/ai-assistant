@@ -13,6 +13,8 @@ android/build/
 android/local.properties
 *.keystore
 !debug.keystore
+*.jks
+android/keystore.properties
 
 # Build artifacts
 *.apk
