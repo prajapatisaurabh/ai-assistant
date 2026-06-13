@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Debug-only: allow cleartext (HTTP) traffic to the Metro dev server
+         (e.g. 10.0.2.2:8081) and expose the RN dev settings activity. This
+         does NOT apply to release builds. -->
+    <application
+        android:usesCleartextTraffic="true"
+        tools:targetApi="28"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name="com.facebook.react.devsupport.DevSettingsActivity"
+            android:exported="false" />
+    </application>
+</manifest>

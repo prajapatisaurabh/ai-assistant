@@ -1,0 +1,29 @@
+# OSX
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.keystore
+!debug.keystore
+
+# Metro
+.metro-health-check*
+
+# Env / secrets
+.env
+.env.local
+backend/.env
+
+# Misc
+coverage/
+*.log
+.vscode/
+.idea/
