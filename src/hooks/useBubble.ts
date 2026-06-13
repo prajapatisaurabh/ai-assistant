@@ -16,7 +16,17 @@ export function useBubble() {
 
   useEffect(() => {
     Overlay.isBubbleRunning().then(setRunning).catch(() => {});
-  }, []);
+
+    // If the user closes the bubble from its own "Close" button, keep the
+    // Settings toggle and persisted flag in sync.
+    const unsub = Overlay.addListener(event => {
+      if (event.type === 'bubbleClosed') {
+        setRunning(false);
+        setBubbleEnabled(false);
+      }
+    });
+    return unsub;
+  }, [setBubbleEnabled]);
 
   const enable = useCallback(async () => {
     let granted = await Overlay.hasOverlayPermission();

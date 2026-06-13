@@ -14,6 +14,10 @@ android/local.properties
 *.keystore
 !debug.keystore
 
+# Build artifacts
+*.apk
+*.aab
+
 # Metro
 .metro-health-check*
 

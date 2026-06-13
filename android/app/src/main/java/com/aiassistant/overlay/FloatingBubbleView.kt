@@ -32,6 +32,7 @@ class FloatingBubbleView(
         fun onTapped()
         fun onQuickAction(action: String, text: String)
         fun onOpenApp()
+        fun onClose()
     }
 
     private val density = context.resources.displayMetrics.density
@@ -76,6 +77,8 @@ class FloatingBubbleView(
             addView(actionRow("📝 Summarize", "summarize"))
             addView(actionRow("📣 Create Social Post", "social"))
             addView(actionRow("💬 Open Assistant", "open"))
+            addView(divider())
+            addView(actionRow("✕ Close Assistant", "close"))
         }
 
         addView(panel)
@@ -87,23 +90,39 @@ class FloatingBubbleView(
     private fun actionRow(label: String, action: String): TextView =
         TextView(context).apply {
             text = label
-            setTextColor(Color.WHITE)
+            // Tint the destructive "Close" row red; others white.
+            setTextColor(if (action == "close") Color.parseColor("#FF6B6B") else Color.WHITE)
             textSize = 14f
             setPadding(dp(14), dp(12), dp(14), dp(12))
             isClickable = true
             setOnClickListener {
-                if (action == "open") {
-                    callbacks.onOpenApp()
-                } else {
-                    val text = pendingClipboardText
-                    if (text != null) {
-                        callbacks.onQuickAction(action, text)
-                    } else {
-                        callbacks.onTapped()
+                when (action) {
+                    "open" -> callbacks.onOpenApp()
+                    "close" -> {
+                        callbacks.onClose()
+                        return@setOnClickListener // view is being torn down
+                    }
+                    else -> {
+                        val text = pendingClipboardText
+                        if (text != null) {
+                            callbacks.onQuickAction(action, text)
+                        } else {
+                            callbacks.onTapped()
+                        }
                     }
                 }
                 collapse()
             }
+        }
+
+    /** Thin separator line used inside the action panel. */
+    private fun divider(): View =
+        View(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(1)).apply {
+                topMargin = dp(4)
+                bottomMargin = dp(4)
+            }
+            setBackgroundColor(Color.parseColor("#33FFFFFF"))
         }
 
     /** Called by the service when fresh clipboard text is available. */

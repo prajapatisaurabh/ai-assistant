@@ -91,6 +91,7 @@ class OverlayService : Service() {
                 override fun onQuickAction(action: String, text: String) =
                     emitQuickAction(action, text)
                 override fun onOpenApp() = openApp()
+                override fun onClose() = closeBubble()
             }
         )
         windowManager.addView(bubble, params)
@@ -102,6 +103,13 @@ class OverlayService : Service() {
         val map = Arguments.createMap().apply { putString("type", "bubbleTapped") }
         OverlayModule.emit(this, map)
         openApp()
+    }
+
+    /** Close button on the bubble: notify JS (so Settings syncs) then stop. */
+    private fun closeBubble() {
+        val map = Arguments.createMap().apply { putString("type", "bubbleClosed") }
+        OverlayModule.emit(this, map)
+        stopSelf()
     }
 
     private fun emitQuickAction(action: String, text: String) {

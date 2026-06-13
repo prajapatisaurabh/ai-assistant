@@ -45,7 +45,8 @@ const emitter =
 export type OverlayEvent =
   | {type: 'bubbleTapped'}
   | {type: 'quickAction'; action: 'improve' | 'summarize' | 'social'; text: string}
-  | {type: 'clipboardChanged'; text: string};
+  | {type: 'clipboardChanged'; text: string}
+  | {type: 'bubbleClosed'};
 
 export const Overlay = {
   hasOverlayPermission: () => Native.hasOverlayPermission(),
