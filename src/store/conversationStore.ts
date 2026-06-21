@@ -11,8 +11,9 @@ interface ConversationState {
   activeId: string | null;
   order: string[]; // most-recent-first
 
-  newConversation: (title?: string) => string;
+  newConversation: (title?: string, context?: string) => string;
   setActive: (id: string) => void;
+  archiveConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
   addMessage: (
     conversationId: string,
@@ -38,12 +39,12 @@ interface ConversationState {
 
 export const useConversationStore = create<ConversationState>()(
   persist(
-    (set, get) => ({
+    set => ({
       conversations: {},
       activeId: null,
       order: [],
 
-      newConversation: title => {
+      newConversation: (title, context) => {
         const id = uid();
         const now = Date.now();
         const convo: Conversation = {
@@ -52,6 +53,7 @@ export const useConversationStore = create<ConversationState>()(
           messages: [],
           createdAt: now,
           updatedAt: now,
+          context,
         };
         set(state => ({
           conversations: {...state.conversations, [id]: convo},
@@ -63,6 +65,27 @@ export const useConversationStore = create<ConversationState>()(
 
       setActive: id => set({activeId: id}),
 
+      archiveConversation: id =>
+        set(state => {
+          const convo = state.conversations[id];
+          if (!convo) {
+            return state;
+          }
+          const conversations = {
+            ...state.conversations,
+            [id]: {...convo, archived: true},
+          };
+          // If the archived chat was active, fall back to the most recent
+          // non-archived chat (or null, which prompts a fresh chat).
+          const activeId =
+            state.activeId === id
+              ? state.order.find(
+                  x => x !== id && !conversations[x]?.archived,
+                ) ?? null
+              : state.activeId;
+          return {conversations, activeId};
+        }),
+
       deleteConversation: id =>
         set(state => {
           const {[id]: _removed, ...rest} = state.conversations;
@@ -70,7 +93,10 @@ export const useConversationStore = create<ConversationState>()(
           return {
             conversations: rest,
             order,
-            activeId: state.activeId === id ? order[0] ?? null : state.activeId,
+            activeId:
+              state.activeId === id
+                ? order.find(x => !rest[x]?.archived) ?? null
+                : state.activeId,
           };
         }),
 

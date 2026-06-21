@@ -1,12 +1,14 @@
 import {
   ChatRequest,
   ImproveRequest,
+  MessageRole,
   SocialRequest,
   SummarizeRequest,
 } from '@/types';
 import {OPENAI_BASE_URL, OPENAI_MODEL} from '@/config';
 import {
   SYSTEM_PROMPT,
+  buildCompactPrompt,
   buildImprovePrompt,
   buildSocialPrompt,
   buildSummarizePrompt,
@@ -235,6 +237,18 @@ export const api = {
     result: await complete(withSystem(buildSummarizePrompt(req))),
   }),
 
+  /** Condenses a chat transcript into a carry-over context summary. */
+  compact: async (messages: {role: MessageRole; content: string}[]) => {
+    const transcript = messages
+      .filter(m => m.content.trim())
+      .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+      .join('\n');
+    return complete(withSystem(buildCompactPrompt(transcript)), {
+      maxTokens: 400,
+      temperature: 0.3,
+    });
+  },
+
   social: async (req: SocialRequest) => {
     const content =
       req.source.kind === 'url'
@@ -269,6 +283,14 @@ export const api = {
     const messages: Msg[] = [
       {role: 'system', content: SYSTEM_PROMPT},
       {role: 'system', content: `Respond using a ${req.tone} tone.`},
+      ...(req.context
+        ? [
+            {
+              role: 'system' as const,
+              content: `Context carried over from an earlier conversation:\n${req.context}`,
+            },
+          ]
+        : []),
       ...req.messages.map(m => ({role: m.role, content: m.content})),
     ];
     streamCompletion(messages, handlers);

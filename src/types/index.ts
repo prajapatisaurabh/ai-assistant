@@ -71,6 +71,10 @@ export interface Conversation {
   messages: ChatMessage[];
   createdAt: number;
   updatedAt: number;
+  /** Carried-over summary from a compacted previous chat, injected as context. */
+  context?: string;
+  /** Archived chats are retained but hidden from the active view. */
+  archived?: boolean;
 }
 
 /** Quick action surfaced after a clipboard copy is detected. */
@@ -101,4 +105,6 @@ export interface ChatRequest {
   conversationId: string;
   messages: {role: MessageRole; content: string}[];
   tone: Tone;
+  /** Summary carried over from a compacted earlier conversation. */
+  context?: string;
 }

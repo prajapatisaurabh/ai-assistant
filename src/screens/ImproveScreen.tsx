@@ -111,11 +111,11 @@ export const ImproveScreen: React.FC = () => {
 
         <Button label="Improve" onPress={run} loading={loading} />
 
-        {error && (
+        {error ? (
           <Text style={{color: c.error, marginTop: 12}}>{error}</Text>
-        )}
+        ) : null}
 
-        {result !== '' && (
+        {result !== '' ? (
           <Card style={{marginTop: 16}}>
             <Text style={{color: c.onSurface, fontSize: 15, lineHeight: 22}}>
               {result}
@@ -127,7 +127,7 @@ export const ImproveScreen: React.FC = () => {
               style={{marginTop: 12}}
             />
           </Card>
-        )}
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

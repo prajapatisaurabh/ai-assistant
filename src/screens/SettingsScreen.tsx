@@ -20,12 +20,12 @@ const Row: React.FC<{children: React.ReactNode}> = ({children}) => (
 export const SettingsScreen: React.FC = () => {
   const t = useTheme();
   const c = t.colors;
-  const {
-    themeMode,
-    setThemeMode,
-    clipboardDetectionEnabled,
-    setClipboardDetection,
-  } = useSettingsStore();
+  const themeMode = useSettingsStore(s => s.themeMode);
+  const setThemeMode = useSettingsStore(s => s.setThemeMode);
+  const clipboardDetectionEnabled = useSettingsStore(
+    s => s.clipboardDetectionEnabled,
+  );
+  const setClipboardDetection = useSettingsStore(s => s.setClipboardDetection);
   const {running, toggle} = useBubble();
 
   const apiKey = useApiKeyStore(s => s.key);
@@ -63,7 +63,7 @@ export const SettingsScreen: React.FC = () => {
               {OPENAI_MODEL}
             </Text>
           </Row>
-          {recheck && (
+          {recheck ? (
             <Text
               style={{
                 color: recheck.includes('✓') ? c.success : c.error,
@@ -72,7 +72,7 @@ export const SettingsScreen: React.FC = () => {
               }}>
               {recheck}
             </Text>
-          )}
+          ) : null}
           <View style={styles.keyBtns}>
             <Button
               label={rechecking ? 'Checking…' : 'Re-validate'}

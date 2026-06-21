@@ -96,9 +96,9 @@ export const ApiKeyScreen: React.FC = () => {
             </Pressable>
           </View>
 
-          {message && (
+          {message ? (
             <Text style={[styles.status, {color: statusColor}]}>{message}</Text>
-          )}
+          ) : null}
 
           <Button
             label={check === 'checking' ? 'Validating…' : 'Validate key'}

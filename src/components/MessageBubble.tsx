@@ -7,13 +7,15 @@ import {fonts} from '@/theme/typography';
 
 interface Props {
   message: ChatMessage;
-  onRegenerate?: () => void;
+  /** Dispatcher-style callback: receives the message id to regenerate. */
+  onRegenerate?: (id: string) => void;
 }
 
-export const MessageBubble: React.FC<Props> = ({message, onRegenerate}) => {
+const MessageBubbleComponent: React.FC<Props> = ({message, onRegenerate}) => {
   const t = useTheme();
   const c = t.colors;
   const isUser = message.role === 'user';
+  const canRegenerate = !isUser && !message.streaming && !!onRegenerate;
 
   const copy = () => Clipboard.setString(message.content);
 
@@ -34,24 +36,32 @@ export const MessageBubble: React.FC<Props> = ({message, onRegenerate}) => {
           {message.streaming ? '▋' : ''}
         </Text>
 
-        {!isUser && !message.streaming && (
+        {!isUser && !message.streaming ? (
           <View style={styles.actions}>
             <Pressable onPress={copy} hitSlop={8}>
               <Text style={[styles.action, {color: c.primary}]}>Copy</Text>
             </Pressable>
-            {onRegenerate && (
-              <Pressable onPress={onRegenerate} hitSlop={8}>
+            {canRegenerate ? (
+              <Pressable
+                onPress={() => onRegenerate?.(message.id)}
+                hitSlop={8}>
                 <Text style={[styles.action, {color: c.primary}]}>
                   Regenerate
                 </Text>
               </Pressable>
-            )}
+            ) : null}
           </View>
-        )}
+        ) : null}
       </View>
     </View>
   );
 };
+
+/**
+ * Memoized so a streaming response only re-renders its own bubble, not the
+ * whole list. Relies on a stable `onRegenerate` reference from the parent.
+ */
+export const MessageBubble = React.memo(MessageBubbleComponent);
 
 const styles = StyleSheet.create({
   row: {flexDirection: 'row', paddingHorizontal: 12, marginVertical: 4},

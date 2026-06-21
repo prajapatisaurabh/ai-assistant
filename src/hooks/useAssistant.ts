@@ -29,6 +29,7 @@ export function useAssistant(conversationId: string) {
         {
           conversationId,
           tone,
+          context: convo.context,
           messages: convo.messages
             .filter(m => m.id !== assistantId)
             .map(m => ({role: m.role, content: m.content})),

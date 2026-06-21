@@ -124,7 +124,9 @@ export const SocialScreen: React.FC = () => {
 
         <Button label="Generate posts" onPress={run} loading={loading} />
 
-        {error && <Text style={{color: c.error, marginTop: 12}}>{error}</Text>}
+        {error ? (
+          <Text style={{color: c.error, marginTop: 12}}>{error}</Text>
+        ) : null}
 
         {results.map(r => (
           <View key={r.platform} style={{marginTop: 16}}>

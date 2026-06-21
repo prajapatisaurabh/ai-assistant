@@ -111,6 +111,21 @@ export function buildSummarizePrompt(params: {
   return `Summarize the following content ${lengthGuide}. Capture the key points only.\n\n"""\n${params.text}\n"""`;
 }
 
+/**
+ * Builds the prompt that compacts a chat transcript into a compact context
+ * summary, so a new conversation can continue without the full history.
+ */
+export function buildCompactPrompt(transcript: string): string {
+  return [
+    'Summarize the following conversation into a compact briefing that lets',
+    'the assistant continue the discussion in a new chat without losing',
+    'important context. Capture: the main topic, key facts and decisions, any',
+    'open questions, and the user’s goals or preferences. Use concise bullet',
+    'points. Do not add a preamble.',
+    '\nConversation:\n"""\n' + transcript + '\n"""',
+  ].join('\n');
+}
+
 /** Example prompts shown in the UI / docs. */
 export const EXAMPLE_PROMPTS = {
   textCorrection: [

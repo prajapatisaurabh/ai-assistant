@@ -69,9 +69,9 @@ function BottomTabBar({state, navigation}: MaterialTopTabBarProps) {
             onPress={onPress}
             android_ripple={{color: c.surfaceVariant, borderless: true}}
             style={styles.item}>
-            {focused && (
+            {focused ? (
               <View style={[styles.indicator, {backgroundColor: c.primary}]} />
-            )}
+            ) : null}
             <Text style={{fontSize: 18, color}}>{ICONS[route.name]}</Text>
             <Text style={[styles.label, {color, fontFamily: fonts.medium}]}>
               {route.name}
