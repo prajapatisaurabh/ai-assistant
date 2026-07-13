@@ -12,30 +12,53 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTheme} from '@/theme/ThemeProvider';
 import {Button} from '@/components/Button';
+import {Chip} from '@/components/Chip';
 import {fonts} from '@/theme/typography';
 import {api} from '@/services/api';
+import {
+  ONBOARDING_PROVIDER,
+  PROVIDERS,
+  PROVIDER_IDS,
+  ProviderId,
+} from '@/config';
 import {useApiKeyStore} from '@/store/apiKeyStore';
 
 type Check = 'idle' | 'checking' | 'valid' | 'invalid';
 
 /**
- * First-launch gate: the user pastes their own OpenAI key. We validate it with
- * a token-free GET /models call before saving it encrypted on-device.
+ * First-launch gate: the user picks a provider and pastes their own key. We
+ * validate it with a token-free GET /models call before saving it encrypted
+ * on-device. Gemini is preselected because it has a free tier — a new user can
+ * get running without a funded account.
  */
 export const ApiKeyScreen: React.FC = () => {
   const t = useTheme();
   const c = t.colors;
   const setKey = useApiKeyStore(s => s.setKey);
+  const switchProvider = useApiKeyStore(s => s.switchProvider);
 
+  const [provider, setProvider] = useState<ProviderId>(ONBOARDING_PROVIDER);
   const [value, setValue] = useState('');
   const [reveal, setReveal] = useState(false);
   const [check, setCheck] = useState<Check>('idle');
   const [message, setMessage] = useState<string | null>(null);
 
-  const onChange = (text: string) => {
-    setValue(text);
+  const p = PROVIDERS[provider];
+
+  const reset = () => {
     setCheck('idle');
     setMessage(null);
+  };
+
+  const onChange = (text: string) => {
+    setValue(text);
+    reset();
+  };
+
+  const pickProvider = (id: ProviderId) => {
+    setProvider(id);
+    setValue('');
+    reset();
   };
 
   const validate = async () => {
@@ -44,7 +67,7 @@ export const ApiKeyScreen: React.FC = () => {
     }
     setCheck('checking');
     setMessage(null);
-    const {valid, error} = await api.validateKey(value);
+    const {valid, error} = await api.validateKey(value, provider);
     if (valid) {
       setCheck('valid');
       setMessage('Key is valid ✓');
@@ -55,7 +78,9 @@ export const ApiKeyScreen: React.FC = () => {
   };
 
   const saveAndContinue = () => {
-    // Only reachable once validated.
+    // Only reachable once validated. Switch first so the key lands in the
+    // vault entry for the provider the user actually picked.
+    switchProvider(provider);
     setKey(value);
   };
 
@@ -70,9 +95,30 @@ export const ApiKeyScreen: React.FC = () => {
         <View style={styles.content}>
           <Text style={[styles.brand, {color: c.primary}]}>AI Assistant</Text>
           <Text style={[styles.subtitle, {color: c.onSurfaceVariant}]}>
-            Enter your own OpenAI API key to get started. It's stored encrypted
-            on this device only and used to talk to OpenAI directly.
+            Choose a provider and enter your own API key. It's stored encrypted
+            on this device only and used to talk to {p.label} directly.
           </Text>
+
+          <View style={styles.providers}>
+            {PROVIDER_IDS.map(id => (
+              <Chip
+                key={id}
+                label={
+                  PROVIDERS[id].isFree
+                    ? `${PROVIDERS[id].label} · Free`
+                    : PROVIDERS[id].label
+                }
+                selected={provider === id}
+                onPress={() => pickProvider(id)}
+              />
+            ))}
+          </View>
+
+          {p.isFree ? (
+            <Text style={[styles.freeNote, {color: c.success}]}>
+              {p.label} has a free tier — no card required.
+            </Text>
+          ) : null}
 
           <View
             style={[
@@ -82,7 +128,7 @@ export const ApiKeyScreen: React.FC = () => {
             <TextInput
               value={value}
               onChangeText={onChange}
-              placeholder="sk-..."
+              placeholder={p.keyPlaceholder}
               placeholderTextColor={c.onSurfaceVariant}
               autoCapitalize="none"
               autoCorrect={false}
@@ -117,12 +163,10 @@ export const ApiKeyScreen: React.FC = () => {
           />
 
           <Pressable
-            onPress={() =>
-              Linking.openURL('https://platform.openai.com/api-keys')
-            }
+            onPress={() => Linking.openURL(p.consoleUrl)}
             style={{marginTop: 20}}>
             <Text style={{color: c.primary, textAlign: 'center'}}>
-              Get an API key from platform.openai.com →
+              {p.isFree ? `Get a free ${p.label} key →` : `Get an ${p.label} key →`}
             </Text>
           </Pressable>
         </View>
@@ -139,9 +183,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 28,
+    marginBottom: 20,
     lineHeight: 20,
     fontFamily: fonts.regular,
+  },
+  providers: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  freeNote: {
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
+    fontFamily: fonts.medium,
   },
   inputRow: {
     flexDirection: 'row',

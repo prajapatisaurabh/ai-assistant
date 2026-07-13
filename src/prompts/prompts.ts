@@ -1,9 +1,9 @@
 /**
  * Prompt library.
  *
- * The app builds the final OpenAI prompts on-device from the user's structured
- * request (action/tone/platform), then calls OpenAI directly (BYOK). These
- * builders are consumed by services/api.ts.
+ * The app builds the final prompts on-device from the user's structured request
+ * (action/tone/platform), then calls the active provider directly (BYOK). These
+ * builders are provider-neutral and are consumed by services/api.ts.
  */
 
 import {ImproveAction, Platform, Tone} from '@/types';

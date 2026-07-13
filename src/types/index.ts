@@ -80,7 +80,7 @@ export interface Conversation {
 /** Quick action surfaced after a clipboard copy is detected. */
 export type QuickAction = 'improve' | 'summarize' | 'social';
 
-/** Request payloads consumed by the OpenAI client (services/api.ts). */
+/** Request payloads consumed by the LLM client (services/api.ts). */
 export interface ImproveRequest {
   text: string;
   action: ImproveAction;

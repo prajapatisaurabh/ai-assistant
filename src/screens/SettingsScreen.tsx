@@ -6,7 +6,7 @@ import {Card} from '@/components/Card';
 import {Chip} from '@/components/Chip';
 import {Button} from '@/components/Button';
 import {fonts} from '@/theme/typography';
-import {OPENAI_MODEL} from '@/config';
+import {PROVIDERS, PROVIDER_IDS} from '@/config';
 import {api} from '@/services/api';
 import {useSettingsStore} from '@/store/settingsStore';
 import {useApiKeyStore, maskKey} from '@/store/apiKeyStore';
@@ -28,8 +28,10 @@ export const SettingsScreen: React.FC = () => {
   const setClipboardDetection = useSettingsStore(s => s.setClipboardDetection);
   const {running, toggle} = useBubble();
 
+  const provider = useSettingsStore(s => s.provider);
   const apiKey = useApiKeyStore(s => s.key);
   const clearKey = useApiKeyStore(s => s.clear);
+  const switchProvider = useApiKeyStore(s => s.switchProvider);
   const [recheck, setRecheck] = useState<string | null>(null);
   const [rechecking, setRechecking] = useState(false);
 
@@ -39,7 +41,7 @@ export const SettingsScreen: React.FC = () => {
     }
     setRechecking(true);
     setRecheck(null);
-    const {valid, error} = await api.validateKey(apiKey);
+    const {valid, error} = await api.validateKey(apiKey, provider);
     setRecheck(valid ? 'Key is valid ✓' : error ?? 'Invalid key');
     setRechecking(false);
   };
@@ -50,7 +52,29 @@ export const SettingsScreen: React.FC = () => {
         <Text style={[styles.h1, {color: c.onBackground}]}>Settings</Text>
 
         <Card style={{marginBottom: 12}}>
-          <Text style={[styles.section, {color: c.onSurface}]}>OpenAI API key</Text>
+          <Text style={[styles.section, {color: c.onSurface}]}>AI provider</Text>
+          <View style={styles.wrap}>
+            {PROVIDER_IDS.map(id => (
+              <Chip
+                key={id}
+                label={
+                  PROVIDERS[id].isFree
+                    ? `${PROVIDERS[id].label} · Free`
+                    : PROVIDERS[id].label
+                }
+                selected={provider === id}
+                onPress={() => {
+                  setRecheck(null); // stale result belongs to the old provider
+                  switchProvider(id);
+                }}
+              />
+            ))}
+          </View>
+          <Text style={[styles.hint, {color: c.onSurfaceVariant}]}>
+            Each provider keeps its own key, so you can switch back and forth
+            without pasting again. Switching to a provider you haven't set up
+            yet will ask for its key.
+          </Text>
           <Row>
             <Text style={{color: c.onSurfaceVariant}}>Key</Text>
             <Text style={{color: c.onSurface, fontWeight: '600'}}>
@@ -60,7 +84,7 @@ export const SettingsScreen: React.FC = () => {
           <Row>
             <Text style={{color: c.onSurfaceVariant}}>Model</Text>
             <Text style={{color: c.onSurface, fontWeight: '600'}}>
-              {OPENAI_MODEL}
+              {PROVIDERS[provider].model}
             </Text>
           </Row>
           {recheck ? (

@@ -5,11 +5,12 @@ import {ThemeProvider, useTheme} from '@/theme/ThemeProvider';
 import {RootNavigator} from '@/navigation/RootNavigator';
 import {useOverlayEvents} from '@/hooks/useOverlayEvents';
 import {useApiKeyStore, getApiKey} from '@/store/apiKeyStore';
-import {registerKeyGetter} from '@/services/api';
+import {getProvider} from '@/store/settingsStore';
+import {registerProviderContext} from '@/services/api';
 import {applyGlobalFont} from '@/theme/typography';
 
-// Let the OpenAI client read the user's key from the store.
-registerKeyGetter(getApiKey);
+// Let the LLM client read the active provider and its key from the stores.
+registerProviderContext(() => ({provider: getProvider(), key: getApiKey()}));
 
 // Apply the JetBrains Mono coding font across the whole app (once).
 applyGlobalFont();
