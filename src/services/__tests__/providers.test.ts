@@ -8,7 +8,6 @@ describe('provider registry', () => {
       expect(p.id).toBe(id);
       expect(p.baseUrl).toMatch(/^https:\/\//);
       expect(p.model.length).toBeGreaterThan(0);
-      expect(p.keyPrefix.length).toBeGreaterThan(0);
       expect(p.consoleUrl).toMatch(/^https:\/\//);
     });
   });
@@ -26,17 +25,42 @@ describe('provider registry', () => {
   });
 });
 
-describe('validateKey prefix pre-check', () => {
-  // Rejects locally, before spending a network round-trip.
-  it('rejects an OpenAI key offered to Gemini', async () => {
-    const {valid, error} = await validateKey('sk-abc123', 'gemini');
-    expect(valid).toBe(false);
-    expect(error).toContain('AIza');
+describe('validateKey', () => {
+  const realFetch = global.fetch;
+  afterEach(() => {
+    global.fetch = realFetch;
   });
 
-  it('rejects a Gemini key offered to OpenAI', async () => {
-    const {valid, error} = await validateKey('AIzaSyAbc123', 'openai');
+  it('never rejects a key on its format — only the provider decides', async () => {
+    // Regression guard. An earlier build hardcoded a Gemini "AIza" prefix
+    // check; Google then moved new keys to the "AQ." auth-key format, which
+    // would have locked every new user out before a request was even sent.
+    // A key of ANY shape must reach the network.
+    const seen: string[] = [];
+    global.fetch = jest.fn(async (url: string) => {
+      seen.push(url);
+      return {ok: true, status: 200} as Response;
+    }) as unknown as typeof fetch;
+
+    for (const key of ['AQ.Ab8_newformat', 'AIzaSyLegacy', 'sk-openai', 'x']) {
+      await expect(validateKey(key, 'gemini')).resolves.toEqual({valid: true});
+    }
+    expect(seen).toHaveLength(4);
+    expect(seen[0]).toBe(`${PROVIDERS.gemini.baseUrl}/models`);
+  });
+
+  it('reports an unauthorized key as invalid', async () => {
+    global.fetch = jest.fn(async () => ({ok: false, status: 401} as Response)) as
+      unknown as typeof fetch;
+    const {valid, error} = await validateKey('AQ.Ab8_revoked', 'gemini');
     expect(valid).toBe(false);
-    expect(error).toContain('sk-');
+    expect(error).toBe('Invalid API key.');
+  });
+
+  it('asks for a key rather than calling out with an empty one', async () => {
+    global.fetch = jest.fn() as unknown as typeof fetch;
+    const {valid} = await validateKey('   ', 'gemini');
+    expect(valid).toBe(false);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

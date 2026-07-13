@@ -18,8 +18,15 @@ export interface ProviderConfig {
   /** Base URL for an OpenAI-compatible /chat/completions + /models API. */
   baseUrl: string;
   model: string;
-  /** Cheap local sanity check before spending a network round-trip on a key. */
-  keyPrefix: string;
+  /**
+   * Placeholder shown in the key field — a hint only.
+   *
+   * Note there is deliberately no key-format *validation* anywhere in the app.
+   * Providers rebrand key formats (Google moved from 'AIza' standard keys to
+   * 'AQ.' auth keys in 2026, retiring the old ones), and a hardcoded prefix
+   * check would have locked every new user out. The authoritative check is the
+   * free GET /models call in validateKey.
+   */
   keyPlaceholder: string;
   /** Where the user goes to get a key. */
   consoleUrl: string;
@@ -33,8 +40,7 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     label: 'Google Gemini',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
     model: 'gemini-3.5-flash',
-    keyPrefix: 'AIza',
-    keyPlaceholder: 'AIza...',
+    keyPlaceholder: 'AQ.Ab...',
     consoleUrl: 'https://aistudio.google.com/apikey',
     isFree: true,
   },
@@ -43,7 +49,6 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     label: 'OpenAI',
     baseUrl: 'https://api.openai.com/v1',
     model: 'gpt-4o-mini',
-    keyPrefix: 'sk-',
     keyPlaceholder: 'sk-...',
     consoleUrl: 'https://platform.openai.com/api-keys',
     isFree: false,

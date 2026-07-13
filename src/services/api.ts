@@ -86,12 +86,13 @@ export async function validateKey(
 ): Promise<{valid: boolean; error?: string}> {
   const p = providerId ? PROVIDERS[providerId] : active();
   const trimmed = key.trim();
-  if (!trimmed.startsWith(p.keyPrefix)) {
-    return {
-      valid: false,
-      error: `${p.label} keys usually start with "${p.keyPrefix}".`,
-    };
+  if (!trimmed) {
+    return {valid: false, error: 'Enter a key.'};
   }
+  // Deliberately NOT gated on p.keyPrefixes: providers change key formats
+  // (Google's 'AIza' → 'AQ.' switch in 2026 would have locked every new user
+  // out of a build that hardcoded the old prefix). The network call below is
+  // the only authority on whether a key is good.
   try {
     const res = await fetch(`${p.baseUrl}/models`, {
       headers: {Authorization: `Bearer ${trimmed}`},
