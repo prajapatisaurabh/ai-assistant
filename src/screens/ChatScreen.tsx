@@ -79,6 +79,11 @@ export const ChatScreen: React.FC = () => {
   );
 
   const onSend = () => {
+    // Guards the Enter key as much as the button: a blank or mid-stream submit
+    // would otherwise post an empty turn.
+    if (!input.trim() || busy) {
+      return;
+    }
     send(input, tone);
     setInput('');
     requestAnimationFrame(() =>
@@ -231,6 +236,12 @@ export const ChatScreen: React.FC = () => {
               placeholder="Message AI Assistant…"
               placeholderTextColor={c.onSurfaceVariant}
               multiline
+              // Enter sends. `submitBehavior="submit"` fires onSubmitEditing
+              // without blurring, so the keyboard stays up between turns —
+              // unlike blurOnSubmit, which would drop it on every message.
+              returnKeyType="send"
+              submitBehavior="submit"
+              onSubmitEditing={onSend}
               style={[
                 styles.input,
                 {
