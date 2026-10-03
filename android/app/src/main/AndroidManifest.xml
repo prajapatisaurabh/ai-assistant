@@ -16,7 +16,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="false"
         android:theme="@style/AppTheme">
+        <!-- enableOnBackInvokedCallback=false: React Native 0.75 handles Back
+             via Activity.onBackPressed(), which Android 16 stops calling for
+             apps targeting API 36 unless predictive back is opted out. -->
+
 
         <activity
             android:name=".MainActivity"
