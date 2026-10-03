@@ -1,5 +1,5 @@
-import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Animated, Pressable, StyleSheet, Text, View} from 'react-native';
 import {
   createMaterialTopTabNavigator,
   MaterialTopTabBarProps,
@@ -33,13 +33,16 @@ const ICONS: Record<string, string> = {
  * Keeps the familiar bottom-navigation look (icon + label) while the navigator
  * provides left/right swipe between tabs.
  */
-function BottomTabBar({state, navigation}: MaterialTopTabBarProps) {
+function BottomTabBar({state, navigation, position}: MaterialTopTabBarProps) {
   const t = useTheme();
   const c = t.colors;
   const insets = useSafeAreaInsets();
+  const [barWidth, setBarWidth] = useState(0);
+  const itemWidth = barWidth / state.routes.length;
 
   return (
     <View
+      onLayout={e => setBarWidth(e.nativeEvent.layout.width)}
       style={[
         styles.bar,
         {
@@ -48,6 +51,20 @@ function BottomTabBar({state, navigation}: MaterialTopTabBarProps) {
           paddingBottom: insets.bottom,
         },
       ]}>
+      {/* One indicator driven by the pager's live position, so it slides with
+          the finger during a swipe instead of jumping once the swipe settles. */}
+      {barWidth > 0 ? (
+        <Animated.View
+          style={[
+            styles.indicator,
+            {
+              backgroundColor: c.primary,
+              left: (itemWidth - INDICATOR_WIDTH) / 2,
+              transform: [{translateX: Animated.multiply(position, itemWidth)}],
+            },
+          ]}
+        />
+      ) : null}
       {state.routes.map((route, index) => {
         const focused = state.index === index;
         const color = focused ? c.primary : c.onSurfaceVariant;
@@ -69,9 +86,6 @@ function BottomTabBar({state, navigation}: MaterialTopTabBarProps) {
             onPress={onPress}
             android_ripple={{color: c.surfaceVariant, borderless: true}}
             style={styles.item}>
-            {focused ? (
-              <View style={[styles.indicator, {backgroundColor: c.primary}]} />
-            ) : null}
             <Text style={{fontSize: 18, color}}>{ICONS[route.name]}</Text>
             <Text style={[styles.label, {color, fontFamily: fonts.medium}]}>
               {route.name}
@@ -100,13 +114,15 @@ export const createBottomTabs = () => () => (
   </Tab.Navigator>
 );
 
+const INDICATOR_WIDTH = 32;
+
 const styles = StyleSheet.create({
   bar: {flexDirection: 'row', borderTopWidth: 1},
   item: {flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2},
   indicator: {
     position: 'absolute',
     top: 0,
-    width: 32,
+    width: INDICATOR_WIDTH,
     height: 3,
     borderRadius: 3,
   },
