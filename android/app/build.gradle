@@ -63,6 +63,11 @@ android {
             signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Package native debug symbols into the AAB so Play Console can
+            // symbolicate native crashes and ANRs.
+            ndk {
+                debugSymbolLevel "SYMBOL_TABLE"
+            }
         }
     }
 
