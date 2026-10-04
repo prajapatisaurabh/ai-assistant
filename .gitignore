@@ -33,3 +33,7 @@ coverage/
 *.log
 .vscode/
 .idea/
+
+# Editor swap files
+*.swp
+*.swo
