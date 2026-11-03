@@ -47,7 +47,8 @@ cd android && ./gradlew bundleRelease     # Play Store AAB
 - Zustand stores live in `src/store/`. `settingsStore` and `conversationStore` persist through the MMKV adapter in `services/storage.ts`.
 - API keys live in a **separate** encrypted MMKV vault (`services/keyStorage.ts`) with one entry per provider (`<provider>_api_key`).
 - The vault id `openai-key-vault` and the `openai_api_key` entry name are kept for backward compatibility. Don't rename them.
-- `apiKeyStore.status` (`loading | no-key | ready`) gates the whole UI in `navigation/RootNavigator.tsx`: when there is no key for the active provider, `ApiKeyScreen` is shown instead of the tabs. `switchProvider` re-derives this status from the vault.
+- `apiKeyStore.status` (`loading | no-key | ready`) gates the whole UI in `navigation/RootNavigator.tsx`. `no-key` means **no provider has any key**, and only then is the first-launch `ApiKeyScreen` shown instead of the tabs.
+- Once unlocked, the app must never drop back to that gate. `switchProvider` returns `false` and changes nothing for a provider without a key, and Settings collects the key inline with `components/KeyForm.tsx` → `saveKey`. Keys are written only after validation, never cleared first. `src/store/__tests__/apiKeyStore.test.ts` guards this.
 
 **Native overlay bridge**
 - `src/native/OverlayModule.ts` is the typed JS wrapper. It throws a linking error on non-Android platforms.

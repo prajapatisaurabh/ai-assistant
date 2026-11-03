@@ -113,8 +113,10 @@ is preselected because it has a free tier), paste your key, tap
 
 Under **Settings → AI provider** you can switch providers, re-validate, or
 replace the key. Each provider keeps its own key, so switching back and forth
-doesn't require re-pasting; switching to a provider with no saved key returns
-you to the key screen.
+doesn't require re-pasting. Picking a provider with no saved key (or tapping
+**Replace key**) opens a key form right there in Settings; your current
+provider and key stay in use until the new key is validated and saved, and
+**Cancel** leaves everything as it was.
 
 Models are set per provider in `src/config.ts`.
 

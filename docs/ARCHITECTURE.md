@@ -79,11 +79,19 @@ sequenceDiagram
 The key's format is never checked locally. Providers change key formats
 (Gemini moved from `AIza…` to `AQ.…`), so only the `/models` response decides.
 
-**Switching provider** (Settings → AI provider) calls
-`apiKeyStore.switchProvider(id)`. It saves the new provider in settings and
-loads that provider's key from the vault. If a key is stored, the app stays
-unlocked. If not, `status` becomes `no-key` and `RootNavigator` shows
-`ApiKeyScreen` again.
+`ApiKeyScreen` is shown only while **no** provider has a key. After that, all
+key management happens inside Settings, so the app is never re-gated:
+
+- **Switching provider** (Settings → AI provider) calls
+  `apiKeyStore.switchProvider(id)`. If that provider has a stored key, it
+  becomes active immediately. If not, `switchProvider` returns `false` and
+  changes nothing, and Settings shows an inline `KeyForm` for it.
+- **Replace key** opens the same inline form for the active provider.
+- `KeyForm` validates first and writes only on **Save**
+  (`saveKey(provider, key)`), which stores the key and makes that provider
+  active. **Cancel** leaves the current provider and key untouched.
+- On launch, `load()` prefers the persisted active provider and falls back to
+  any provider that has a key.
 
 ---
 
