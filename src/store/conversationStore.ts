@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
 import {mmkvStorage} from '@/services/storage';
-import {ChatMessage, Conversation, Tone} from '@/types';
+import {ApiErrorKind, ChatMessage, Conversation} from '@/types';
 
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -24,10 +24,11 @@ interface ConversationState {
     messageId: string,
     chunk: string,
   ) => void;
+  /** Marks a streamed message complete, recording the failure kind if it failed. */
   finalizeMessage: (
     conversationId: string,
     messageId: string,
-    tone?: Tone,
+    error?: ApiErrorKind,
   ) => void;
   replaceMessageContent: (
     conversationId: string,
@@ -162,14 +163,14 @@ export const useConversationStore = create<ConversationState>()(
           };
         }),
 
-      finalizeMessage: (conversationId, messageId, tone) =>
+      finalizeMessage: (conversationId, messageId, error) =>
         set(state => {
           const convo = state.conversations[conversationId];
           if (!convo) {
             return state;
           }
           const messages = convo.messages.map(m =>
-            m.id === messageId ? {...m, streaming: false, tone} : m,
+            m.id === messageId ? {...m, streaming: false, error} : m,
           );
           return {
             conversations: {

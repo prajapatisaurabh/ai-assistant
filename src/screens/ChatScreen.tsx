@@ -14,20 +14,17 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTheme} from '@/theme/ThemeProvider';
 import {useConversationStore} from '@/store/conversationStore';
-import {useSettingsStore} from '@/store/settingsStore';
 import {useAssistant} from '@/hooks/useAssistant';
 import {MessageBubble} from '@/components/MessageBubble';
-import {ToneSelector} from '@/components/ToneSelector';
+import {SendButton} from '@/components/SendButton';
 import {ChatMenuSheet, ChatMenuAction} from '@/components/ChatMenuSheet';
 import {api} from '@/services/api';
 import {fonts} from '@/theme/typography';
-import {ChatMessage, Tone} from '@/types';
+import {ChatMessage} from '@/types';
 
 export const ChatScreen: React.FC = () => {
   const t = useTheme();
   const c = t.colors;
-  const defaultTone = useSettingsStore(s => s.defaultTone);
-  const [tone, setTone] = useState<Tone>(defaultTone);
   const [input, setInput] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [compacting, setCompacting] = useState(false);
@@ -54,37 +51,20 @@ export const ChatScreen: React.FC = () => {
 
   const {send, regenerate, busy, cancel} = useAssistant(conversationId);
 
-  // Keep the current tone in a ref so the regenerate dispatcher can stay
-  // stable across renders (tone changes shouldn't recreate list callbacks).
-  const toneRef = useRef(tone);
-  toneRef.current = tone;
-
-  // Single stable callback shared by every bubble (dispatcher pattern). It
-  // looks the message up by id and reuses its original tone when available.
-  const handleRegenerate = useCallback(
-    (id: string) => {
-      const msg = useConversationStore
-        .getState()
-        .conversations[conversationId]?.messages.find(m => m.id === id);
-      regenerate(id, msg?.tone ?? toneRef.current);
-    },
-    [conversationId, regenerate],
-  );
-
+  // Single stable callback shared by every bubble (dispatcher pattern).
   const renderItem = useCallback(
     ({item}: {item: ChatMessage}) => (
-      <MessageBubble message={item} onRegenerate={handleRegenerate} />
+      <MessageBubble message={item} onRegenerate={regenerate} />
     ),
-    [handleRegenerate],
+    [regenerate],
   );
 
   const onSend = () => {
-    // Guards the Enter key as much as the button: a blank or mid-stream submit
-    // would otherwise post an empty turn.
+    // A blank or mid-stream send would otherwise post an empty turn.
     if (!input.trim() || busy) {
       return;
     }
-    send(input, tone);
+    send(input);
     setInput('');
     requestAnimationFrame(() =>
       listRef.current?.scrollToEnd({animated: true}),
@@ -106,7 +86,9 @@ export const ChatScreen: React.FC = () => {
     setCompacting(true);
     try {
       const summary = await api.compact(
-        messages.map(m => ({role: m.role, content: m.content})),
+        messages
+          .filter(m => !m.error) // error text isn't conversation content
+          .map(m => ({role: m.role, content: m.content})),
       );
       newConversation('Continued chat', summary);
     } catch (e) {
@@ -228,20 +210,17 @@ export const ChatScreen: React.FC = () => {
         />
 
         <View style={[styles.composer, {borderTopColor: c.outline, backgroundColor: c.surface}]}>
-          <ToneSelector value={tone} onChange={setTone} />
           <View style={styles.inputRow}>
             <TextInput
               value={input}
               onChangeText={setInput}
               placeholder="Message AI Assistant…"
               placeholderTextColor={c.onSurfaceVariant}
+              // Enter (and Shift+Enter) inserts a new line; only the send
+              // button sends. RN's Android key events carry no Shift modifier,
+              // so "Enter sends, Shift+Enter breaks" can't be told apart —
+              // newline-on-Enter is the reliable choice for multi-line input.
               multiline
-              // Enter sends. `submitBehavior="submit"` fires onSubmitEditing
-              // without blurring, so the keyboard stays up between turns —
-              // unlike blurOnSubmit, which would drop it on every message.
-              returnKeyType="send"
-              submitBehavior="submit"
-              onSubmitEditing={onSend}
               style={[
                 styles.input,
                 {
@@ -251,13 +230,12 @@ export const ChatScreen: React.FC = () => {
                 },
               ]}
             />
-            <Pressable
-              onPress={busy ? cancel : onSend}
-              style={[styles.sendBtn, {backgroundColor: c.primary}]}>
-              <Text style={{color: c.onPrimary, fontWeight: '700'}}>
-                {busy ? '■' : '↑'}
-              </Text>
-            </Pressable>
+            <SendButton
+              busy={busy}
+              canSend={input.trim().length > 0}
+              onSend={onSend}
+              onStop={cancel}
+            />
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -302,8 +280,9 @@ const styles = StyleSheet.create({
   emptyTitle: {fontSize: 22, fontFamily: fonts.bold},
   composer: {borderTopWidth: StyleSheet.hairlineWidth, padding: 8, gap: 8},
   inputRow: {flexDirection: 'row', alignItems: 'flex-end', gap: 8},
-  input: {flex: 1, maxHeight: 120, minHeight: 44, paddingHorizontal: 14, paddingTop: 12, fontSize: 15, fontFamily: fonts.regular},
-  sendBtn: {width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center'},
+  // Equal vertical padding so a single line sits centered at the same 44dp
+  // height as the send button.
+  input: {flex: 1, maxHeight: 120, minHeight: 44, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, fontSize: 15, lineHeight: 20, textAlignVertical: 'center', fontFamily: fonts.regular},
   compactingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.35)',

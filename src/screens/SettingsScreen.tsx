@@ -5,8 +5,9 @@ import {useTheme} from '@/theme/ThemeProvider';
 import {Card} from '@/components/Card';
 import {Chip} from '@/components/Chip';
 import {Button} from '@/components/Button';
+import {KeyForm} from '@/components/KeyForm';
 import {fonts} from '@/theme/typography';
-import {PROVIDERS, PROVIDER_IDS} from '@/config';
+import {PROVIDERS, PROVIDER_IDS, ProviderId} from '@/config';
 import {api} from '@/services/api';
 import {useSettingsStore} from '@/store/settingsStore';
 import {useApiKeyStore, maskKey} from '@/store/apiKeyStore';
@@ -30,10 +31,21 @@ export const SettingsScreen: React.FC = () => {
 
   const provider = useSettingsStore(s => s.provider);
   const apiKey = useApiKeyStore(s => s.key);
-  const clearKey = useApiKeyStore(s => s.clear);
   const switchProvider = useApiKeyStore(s => s.switchProvider);
   const [recheck, setRecheck] = useState<string | null>(null);
   const [rechecking, setRechecking] = useState(false);
+  // Provider whose key is being entered inline (adding one, or replacing the
+  // active one). The active provider and its key stay untouched until Save.
+  const [editing, setEditing] = useState<ProviderId | null>(null);
+
+  const pickProvider = (id: ProviderId) => {
+    setRecheck(null); // stale result belongs to the old provider
+    if (switchProvider(id)) {
+      setEditing(null);
+    } else {
+      setEditing(id); // no key yet — collect one here instead of gating the app
+    }
+  };
 
   const revalidate = async () => {
     if (!apiKey) {
@@ -62,18 +74,32 @@ export const SettingsScreen: React.FC = () => {
                     ? `${PROVIDERS[id].label} · Free`
                     : PROVIDERS[id].label
                 }
-                selected={provider === id}
-                onPress={() => {
-                  setRecheck(null); // stale result belongs to the old provider
-                  switchProvider(id);
-                }}
+                selected={(editing ?? provider) === id}
+                onPress={() => pickProvider(id)}
               />
             ))}
           </View>
+          {editing ? (
+            <>
+              <Text style={[styles.hint, {color: c.onSurfaceVariant}]}>
+                {editing === provider
+                  ? `Enter a new ${PROVIDERS[editing].label} key. Your current key stays in use until you save.`
+                  : `Add a ${PROVIDERS[editing].label} key to switch. You'll keep using ${PROVIDERS[provider].label} until you save.`}
+              </Text>
+              <View style={{marginTop: 12}}>
+                <KeyForm
+                  key={editing}
+                  provider={editing}
+                  onSaved={() => setEditing(null)}
+                  onCancel={() => setEditing(null)}
+                />
+              </View>
+            </>
+          ) : (
+            <>
           <Text style={[styles.hint, {color: c.onSurfaceVariant}]}>
             Each provider keeps its own key, so you can switch back and forth
-            without pasting again. Switching to a provider you haven't set up
-            yet will ask for its key.
+            without pasting again.
           </Text>
           <Row>
             <Text style={{color: c.onSurfaceVariant}}>Key</Text>
@@ -108,10 +134,15 @@ export const SettingsScreen: React.FC = () => {
             <Button
               label="Replace key"
               variant="outlined"
-              onPress={clearKey}
+              onPress={() => {
+                setRecheck(null);
+                setEditing(provider);
+              }}
               style={{flex: 1}}
             />
           </View>
+            </>
+          )}
         </Card>
 
         <Card>

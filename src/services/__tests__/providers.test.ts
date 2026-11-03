@@ -54,7 +54,7 @@ describe('validateKey', () => {
       unknown as typeof fetch;
     const {valid, error} = await validateKey('AQ.Ab8_revoked', 'gemini');
     expect(valid).toBe(false);
-    expect(error).toBe('Invalid API key.');
+    expect(error).toBe('Invalid or expired API key.');
   });
 
   it('asks for a key rather than calling out with an empty one', async () => {
@@ -106,7 +106,7 @@ describe('transient upstream failures', () => {
   it('does not retry a bad key — retrying a 401 just wastes time', async () => {
     respond([401]);
     await expect(api.summarize({text: 'x', length: 'short'})).rejects.toThrow(
-      /Invalid API key/,
+      /API key is invalid, expired or revoked/,
     );
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });

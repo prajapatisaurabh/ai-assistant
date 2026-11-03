@@ -61,9 +61,22 @@ export interface ChatMessage {
   createdAt: number;
   /** True while a response is still streaming in. */
   streaming?: boolean;
-  /** Tone used to produce an assistant message (for regeneration). */
-  tone?: Tone;
+  /** Set when this assistant turn failed; `content` holds the user-facing message. */
+  error?: ApiErrorKind;
 }
+
+/**
+ * What went wrong with a provider call, as far as the user is concerned.
+ * 'auth' and 'quota' can only be fixed in Settings or the provider's console,
+ * so the UI offers a way there.
+ */
+export type ApiErrorKind =
+  | 'auth' // key invalid, expired, revoked or blocked
+  | 'quota' // out of credits / billing quota
+  | 'rate_limit' // too many requests right now
+  | 'overloaded' // provider 5xx
+  | 'network'
+  | 'other';
 
 export interface Conversation {
   id: string;
@@ -104,7 +117,6 @@ export interface SummarizeRequest {
 export interface ChatRequest {
   conversationId: string;
   messages: {role: MessageRole; content: string}[];
-  tone: Tone;
   /** Summary carried over from a compacted earlier conversation. */
   context?: string;
 }
