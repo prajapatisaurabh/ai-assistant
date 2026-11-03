@@ -70,7 +70,7 @@ ai-assistant/
 | Text improvement (6 actions) | `screens/ImproveScreen.tsx`, `prompts/prompts.ts` |
 | Social post generator (4 platforms, variations, hashtags) | `screens/SocialScreen.tsx` |
 | Clipboard quick actions | `OverlayService.kt` clipboard listener → `useOverlayEvents.ts` |
-| Chat panel (history, copy, regenerate, tone) | `screens/ChatScreen.tsx`, `hooks/useAssistant.ts` |
+| Chat panel (history, copy, regenerate, multi-line input) | `screens/ChatScreen.tsx`, `hooks/useAssistant.ts` |
 | Direct provider calls + streaming + retry on 5xx | `services/api.ts` (fetch + XHR/SSE) |
 | Dark mode + Material 3 | `theme/`, `ThemeProvider.tsx` |
 

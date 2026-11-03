@@ -38,6 +38,12 @@ cd android && ./gradlew bundleRelease     # Play Store AAB
 - Gemini doesn't always send `[DONE]`, so `onload` also fires `onDone`.
 - 5xx responses are retried with backoff (up to 3 attempts). A stream is retried only if it failed **before** emitting any token; otherwise the retry would duplicate text already shown.
 - `validateKey` checks a key by calling the free `GET /models` endpoint.
+- Every failure goes through `classifyError` and becomes an `ApiError` with a `kind` (`auth | quota | rate_limit | overloaded | network | other`):
+  - Gemini reports an expired or invalid key as **400/403, not 401**, and its compat endpoint may wrap the error body in an array.
+  - OpenAI uses 429 for both rate limits and `insufficient_quota`.
+  - A 200 stream can carry a `data: {"error":…}` frame. A stream that produces no text is reported as an error.
+- Chat stores the kind on the failed message (`ChatMessage.error`). `MessageBubble` renders it as an error, with **Open Settings** for `auth`/`quota`. Failed turns are excluded from the history sent to the model and from compaction.
+- Fixtures of real provider error bodies live in `src/services/__tests__/errors.test.ts`.
 
 **Deliberate invariants (guarded by tests in `src/services/__tests__/providers.test.ts`)**
 - No key-format/prefix validation anywhere. Google moved Gemini keys from `AIza` to `AQ.`, and a prefix check would lock users out. Only the provider's response decides whether a key is valid.

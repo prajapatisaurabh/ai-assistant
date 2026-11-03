@@ -45,8 +45,7 @@ Turn an article, link, or note into ready-to-post content for X, LinkedIn,
 Facebook and Instagram—with multiple variations and relevant hashtags.
 
 💬 CHAT ASSISTANT
-A clean chat with tone control (Professional, Casual, Friendly, Marketing,
-Technical), streaming replies, copy and regenerate.
+A clean chat with streaming replies, multi-line messages, copy and regenerate.
 
 🫧 FLOATING BUBBLE
 A draggable bubble floats over other apps. Copy text anywhere and get instant

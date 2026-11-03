@@ -129,13 +129,12 @@ The app fetches and strips the article on-device (`fetchArticleText` in `service
 
 ---
 
-## 4. Chat (streaming, tone-aware)
+## 4. Chat (streaming)
 
 **App call → `api.streamChat(...)`**
 ```json
 {
   "conversationId": "abc",
-  "tone": "technical",
   "messages": [
     { "role": "user", "content": "Improve this text:\n\nthe app crash when i tap save sometimes" }
   ]
@@ -143,5 +142,7 @@ The app fetches and strips the article on-device (`fetchArticleText` in `service
 ```
 Both providers stream OpenAI-shaped SSE (`data: {choices:[{delta:{content}}]}`
 … `data: [DONE]`; Gemini may end the stream without `[DONE]`);
-`api.streamChat` surfaces each text delta via `onChunk`. Tone is injected as a
-per-turn system note. `conversationId` is used by the app's local history only.
+`api.streamChat` surfaces each text delta via `onChunk`. Chat has no tone
+setting (tone applies to Improve and Social only); a carried-over `context`
+summary, when present, is injected as a system note. `conversationId` is used
+by the app's local history only.

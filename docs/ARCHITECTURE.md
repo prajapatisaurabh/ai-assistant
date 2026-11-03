@@ -110,7 +110,7 @@ sequenceDiagram
 
   U->>RN: Type message, tap send
   RN->>RN: addMessage(user) + empty assistant msg (streaming=true)
-  RN->>API: streamChat({messages, tone})
+  RN->>API: streamChat({messages, context?})
   API->>OAI: POST stream:true, Bearer <user key>
   loop each token chunk
     OAI-->>API: data: {choices:[{delta:{content}}]}
