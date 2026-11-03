@@ -53,12 +53,14 @@ A draggable bubble floats over other apps. Copy text anywhere and get instant
 quick actions: Improve, Summarize, or Create Social Post. Close it anytime.
 
 🔐 BRING YOUR OWN KEY — PRIVATE BY DESIGN
-You use your own OpenAI API key, stored encrypted on your device. Your text is
-sent directly to OpenAI to generate results and is never collected by us. No
-account, no server, no tracking.
+Choose Google Gemini (free tier available) or OpenAI and use your own API key,
+stored encrypted on your device. Your text is sent directly to the provider you
+choose to generate results and is never collected by us. No account, no server,
+no tracking.
 
-Note: Requires your own OpenAI API key (platform.openai.com). Standard OpenAI
-usage charges apply to your account.
+Note: Requires your own API key — Google Gemini (aistudio.google.com, free tier
+available) or OpenAI (platform.openai.com). Any usage charges from your chosen
+provider apply to your account.
 ```
 
 ---
@@ -86,15 +88,29 @@ WHAT WE COLLECT
 We (the developer) do not collect, store, or transmit any of your personal data
 to our own servers. The app has no backend and no analytics.
 
-YOUR OPENAI API KEY
-You provide your own OpenAI API key. It is stored only on your device in encrypted
-storage and is sent only to OpenAI (https://api.openai.com) to authenticate your
-requests. It is never sent to us or any third party.
+AI PROVIDERS
+The app works with one of two AI providers, chosen by you in the app:
+- Google Gemini (Google LLC) — https://generativelanguage.googleapis.com
+- OpenAI — https://api.openai.com
+Only the provider you have selected receives your requests.
+
+YOUR API KEYS
+You provide your own API key for the provider you choose. Keys are stored only
+on your device in encrypted storage. Each key is sent only to the provider it
+belongs to, to authenticate your requests. It is never sent to us or any other
+third party.
 
 YOUR TEXT
 Text you choose to improve, summarize, or turn into posts is sent directly from
-your device to OpenAI to generate a result. This is governed by OpenAI's privacy
-policy (https://openai.com/policies/privacy-policy). We never receive or store it.
+your device to your selected provider to generate a result. We never receive or
+store it. How the provider handles your text is governed by its own terms and
+privacy policy:
+- Google: https://policies.google.com/privacy and the Gemini API Additional
+  Terms (https://ai.google.dev/gemini-api/terms). Note: under those terms, when
+  you use Gemini's free (unpaid) tier, Google may use your prompts and responses
+  to improve its products, and they may be reviewed by humans. Do not submit
+  sensitive or personal information if this concerns you.
+- OpenAI: https://openai.com/policies/privacy-policy
 
 CLIPBOARD
 If you enable clipboard detection, the app reads clipboard text only to offer
@@ -117,11 +133,12 @@ CONTACT
 
 ## 4. Data safety form (Console answers)
 - **Does your app collect or share user data?** → **No** (the developer collects nothing).
-- If asked about data sent off-device: the app sends user-entered text **to OpenAI**,
-  processed to provide the feature, **not** collected by the developer. Declare it as
-  "Data is processed but not collected" where applicable; reference OpenAI as the
-  third party. Keep this consistent with the privacy policy above.
-- Encryption in transit: **Yes** (HTTPS to OpenAI).
+- If asked about data sent off-device: the app sends user-entered text **to the
+  AI provider the user selects (Google Gemini or OpenAI)**, processed to provide
+  the feature, **not** collected by the developer. Declare it as "Data is
+  processed but not collected" where applicable; reference **both Google and
+  OpenAI** as the third parties. Keep this consistent with the privacy policy above.
+- Encryption in transit: **Yes** (HTTPS to both providers).
 
 ---
 
