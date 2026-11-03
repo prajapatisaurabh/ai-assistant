@@ -4,30 +4,55 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Soft drop shadow under the bubble -->
-    <group android:translateY="2.5">
+    <!-- Friendly AI assistant bot, mirror-symmetric on x=54 and kept inside the
+         66dp adaptive-icon safe zone (scaled 94% for breathing room). -->
+    <group
+        android:pivotX="54"
+        android:pivotY="52"
+        android:scaleX="0.94"
+        android:scaleY="0.94"
+        android:translateY="1">
+        <!-- Soft drop shadow under head + ears -->
+        <group android:translateY="2.5">
+            <path
+                android:fillColor="#29000000"
+                android:pathData="M44,41 H64 A14,14 0 0 1 78,55 V65 A14,14 0 0 1 64,79 H44 A14,14 0 0 1 30,65 V55 A14,14 0 0 1 44,41 Z M30,54 H27.5 A2.5,2.5 0 0 0 25,56.5 V63.5 A2.5,2.5 0 0 0 27.5,66 H30 Z M78,54 H80.5 A2.5,2.5 0 0 1 83,56.5 V63.5 A2.5,2.5 0 0 1 80.5,66 H78 Z" />
+        </group>
+        <!-- Antenna stem + AI sparkle -->
         <path
-            android:fillColor="#26000000"
-            android:pathData="M42,28 H66 A14,14 0 0 1 80,42 V56 A14,14 0 0 1 66,70 H50 L36.5,79 C37.8,76 38.3,72.8 38.3,69.5 A14,14 0 0 1 28,56 V42 A14,14 0 0 1 42,28 Z" />
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M52.6,33 H55.4 V41.5 H52.6 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M54,21.5 C54.8,25.6 55.9,26.7 60.5,28 C55.9,29.3 54.8,30.4 54,34.5 C53.2,30.4 52.1,29.3 47.5,28 C52.1,26.7 53.2,25.6 54,21.5 Z" />
+        <!-- Headset ears -->
+        <path
+            android:fillColor="#FFE0E7FF"
+            android:pathData="M30,54 H27.5 A2.5,2.5 0 0 0 25,56.5 V63.5 A2.5,2.5 0 0 0 27.5,66 H30 Z M78,54 H80.5 A2.5,2.5 0 0 1 83,56.5 V63.5 A2.5,2.5 0 0 1 80.5,66 H78 Z" />
+        <!-- Head -->
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M44,41 H64 A14,14 0 0 1 78,55 V65 A14,14 0 0 1 64,79 H44 A14,14 0 0 1 30,65 V55 A14,14 0 0 1 44,41 Z" />
+        <!-- Visor -->
+        <path android:pathData="M44,47 H64 A9,9 0 0 1 73,56 V63 A9,9 0 0 1 64,72 H44 A9,9 0 0 1 35,63 V56 A9,9 0 0 1 44,47 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="35" android:startY="47"
+                    android:endX="73" android:endY="72">
+                    <item android:offset="0.0" android:color="#FF1E1B4B" />
+                    <item android:offset="1.0" android:color="#FF172554" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <!-- Glowing eyes + smile -->
+        <path
+            android:fillColor="#FF22D3EE"
+            android:pathData="M43.5,56 A2.5,2.5 0 0 1 48.5,56 V60 A2.5,2.5 0 0 1 43.5,60 Z M59.5,56 A2.5,2.5 0 0 1 64.5,56 V60 A2.5,2.5 0 0 1 59.5,60 Z" />
+        <path
+            android:strokeColor="#FF22D3EE"
+            android:strokeWidth="2.2"
+            android:strokeLineCap="round"
+            android:pathData="M50,65.5 Q54,68.5 58,65.5" />
     </group>
-    <!-- Floating chat bubble, kept inside the 66dp adaptive-icon safe zone -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M42,28 H66 A14,14 0 0 1 80,42 V56 A14,14 0 0 1 66,70 H50 L36.5,79 C37.8,76 38.3,72.8 38.3,69.5 A14,14 0 0 1 28,56 V42 A14,14 0 0 1 42,28 Z" />
-    <!-- Main 4-point "AI sparkle" inside the bubble -->
-    <path android:pathData="M54,36 C55.8,45 58,47.2 67,49 C58,50.8 55.8,53 54,62 C52.2,53 50,50.8 41,49 C50,47.2 52.2,45 54,36 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="42" android:startY="36"
-                android:endX="66" android:endY="62">
-                <item android:offset="0.0" android:color="#FF4F46E5" />
-                <item android:offset="1.0" android:color="#FF06B6D4" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- Small accent sparkle, upper-right -->
-    <path
-        android:fillColor="#FF4F46E5"
-        android:pathData="M69,33.5 C69.5,36.6 70.4,37.5 73.5,38 C70.4,38.5 69.5,39.4 69,42.5 C68.5,39.4 67.6,38.5 64.5,38 C67.6,37.5 68.5,36.6 69,33.5 Z" />
 </vector>

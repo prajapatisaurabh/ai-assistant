@@ -4,9 +4,25 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <!-- Themed-icon silhouette (Android 13+); the system tints this.
-         Bubble with the sparkles cut out (evenOdd), matching the foreground. -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="M42,28 H66 A14,14 0 0 1 80,42 V56 A14,14 0 0 1 66,70 H50 L36.5,79 C37.8,76 38.3,72.8 38.3,69.5 A14,14 0 0 1 28,56 V42 A14,14 0 0 1 42,28 Z M54,36 C55.8,45 58,47.2 67,49 C58,50.8 55.8,53 54,62 C52.2,53 50,50.8 41,49 C50,47.2 52.2,45 54,36 Z M69,33.5 C69.5,36.6 70.4,37.5 73.5,38 C70.4,38.5 69.5,39.4 69,42.5 C68.5,39.4 67.6,38.5 64.5,38 C67.6,37.5 68.5,36.6 69,33.5 Z" />
+         Same bot as the foreground: head with the visor cut out (evenOdd) and
+         the eyes filled back in. -->
+    <group
+        android:pivotX="54"
+        android:pivotY="52"
+        android:scaleX="0.94"
+        android:scaleY="0.94"
+        android:translateY="1">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M44,41 H64 A14,14 0 0 1 78,55 V65 A14,14 0 0 1 64,79 H44 A14,14 0 0 1 30,65 V55 A14,14 0 0 1 44,41 Z M44,47 H64 A9,9 0 0 1 73,56 V63 A9,9 0 0 1 64,72 H44 A9,9 0 0 1 35,63 V56 A9,9 0 0 1 44,47 Z M43.5,56 A2.5,2.5 0 0 1 48.5,56 V60 A2.5,2.5 0 0 1 43.5,60 Z M59.5,56 A2.5,2.5 0 0 1 64.5,56 V60 A2.5,2.5 0 0 1 59.5,60 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M30,54 H27.5 A2.5,2.5 0 0 0 25,56.5 V63.5 A2.5,2.5 0 0 0 27.5,66 H30 Z M78,54 H80.5 A2.5,2.5 0 0 1 83,56.5 V63.5 A2.5,2.5 0 0 1 80.5,66 H78 Z M52.6,33 H55.4 V41.5 H52.6 Z M54,21.5 C54.8,25.6 55.9,26.7 60.5,28 C55.9,29.3 54.8,30.4 54,34.5 C53.2,30.4 52.1,29.3 47.5,28 C52.1,26.7 53.2,25.6 54,21.5 Z" />
+        <path
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="2.2"
+            android:strokeLineCap="round"
+            android:pathData="M50,65.5 Q54,68.5 58,65.5" />
+    </group>
 </vector>
