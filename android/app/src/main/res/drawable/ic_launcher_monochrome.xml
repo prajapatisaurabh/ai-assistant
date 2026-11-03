@@ -3,11 +3,10 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Themed-icon silhouette (Android 13+); the system tints this. -->
+    <!-- Themed-icon silhouette (Android 13+); the system tints this.
+         Bubble with the sparkles cut out (evenOdd), matching the foreground. -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M52,24 C56,44 64,52 84,56 C64,60 56,68 52,88 C48,68 40,60 20,56 C40,52 48,44 52,24 Z" />
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M80,20 C81.5,28 83,29.5 91,31 C83,32.5 81.5,34 80,42 C78.5,34 77,32.5 69,31 C77,29.5 78.5,28 80,20 Z" />
+        android:fillType="evenOdd"
+        android:pathData="M42,28 H66 A14,14 0 0 1 80,42 V56 A14,14 0 0 1 66,70 H50 L36.5,79 C37.8,76 38.3,72.8 38.3,69.5 A14,14 0 0 1 28,56 V42 A14,14 0 0 1 42,28 Z M54,36 C55.8,45 58,47.2 67,49 C58,50.8 55.8,53 54,62 C52.2,53 50,50.8 41,49 C50,47.2 52.2,45 54,36 Z M69,33.5 C69.5,36.6 70.4,37.5 73.5,38 C70.4,38.5 69.5,39.4 69,42.5 C68.5,39.4 67.6,38.5 64.5,38 C67.6,37.5 68.5,36.6 69,33.5 Z" />
 </vector>
